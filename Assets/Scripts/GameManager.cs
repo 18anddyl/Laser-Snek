@@ -1,14 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     //Apple Variables
     public GameObject apple;
     public bool appleAlive = true;
-    private int minBorder = -5;
-    private int maxBorder = 5;
+    private float minBorder = -4.75f;
+    private float maxBorder = 4.75f;
 
     //Highscore Variable
     public int score;
@@ -16,33 +18,80 @@ public class GameManager : MonoBehaviour
     //Title screen Variables
     public GameObject titleScreen;
     public bool gameStart = false;
+    public GameObject deathScreen;
+    public bool death = false;
+    public GameObject scoreText;
 
-    // Start is called before the first frame update
+    //Turret shooting variable
+    public GameObject[] turrets;
+
+
+
     void Start()
     {
-        
+        //Titlescreen UI
+        titleScreen.SetActive(true);
+        deathScreen.SetActive(false);
+        scoreText.SetActive(false);
+
+        StartCoroutine(RandomShoot());
+
     }
 
-    // Update is called once per frame
+    //Start game
+    public void OnStartButtonPress()
+    {
+        titleScreen.SetActive(false);
+        scoreText.SetActive(true);
+        gameStart = true;
+    }
+    //Play again
+    public void OnPlayAgainButtonPress()
+    {
+        SceneManager.LoadScene("Game Scene");
+    }
+
     void Update()
     {
-        if(appleAlive == false)
+
+        scoreText.GetComponent<TMPro.TextMeshProUGUI>().text = "Score : " + score.ToString();
+        //Spawn new apple when snake eats apple
+        if(!appleAlive)
         {
             SpawnApple();
             appleAlive = true;
             score++;
         }
+        if(death)
+        {
+            deathScreen.SetActive(true);
+            scoreText.SetActive(false);
+        }
     }
-
+    //Choose random place for apple to spawn
     void SpawnApple()
     {
-        var spawnApplePos = new Vector3(Random.Range(minBorder, maxBorder), 1.25f, Random.Range(minBorder, maxBorder));
+        Vector3 spawnApplePos = new(Random.Range(minBorder, maxBorder), 1.25f, Random.Range(minBorder, maxBorder));
         Instantiate(apple, spawnApplePos, transform.rotation);
     }
 
-    public void OnStartButtonPress()
+    IEnumerator RandomShoot()
     {
-        titleScreen.SetActive(false);
-        gameStart = true;
+        yield return new WaitForSeconds(Random.Range(2f, 5f));
+        Shooting();
+        StartCoroutine(RandomShoot());
     }
+    void Shooting()
+    {
+        int number = Random.Range(0, turrets.Length);
+        GameObject shootingTurret = turrets[number];
+        LaserTurret shootingTurretScript = shootingTurret.GetComponent<LaserTurret>();
+        shootingTurretScript.shoot = true;
+
+    }
+
+    
+
+
+
 }

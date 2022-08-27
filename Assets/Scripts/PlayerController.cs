@@ -4,19 +4,21 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private GameManager gameManager;
+    public GameManager gameManager;
+    public int speed = 2;
     // Start is called before the first frame update
     void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
-        while(gameManager.gameStart == true)
+        //Player Moving
+        if(gameManager.gameStart == true)
         {
-            transform.Translate(Vector3.up * Time.deltaTime);
+            transform.Translate(Vector3.up * Time.deltaTime * speed);
             if (Input.GetKey(KeyCode.UpArrow))
             {
                 transform.rotation = Quaternion.Euler(0, 90, 90);
@@ -45,6 +47,12 @@ public class PlayerController : MonoBehaviour
             Destroy(other.gameObject);
             gameManager.appleAlive = false;
         }
+        else if (other.gameObject.CompareTag("Wall") || other.gameObject.CompareTag("Laser"))
+        {
+            gameManager.gameStart = false;
+            gameManager.death = true;
+        }
+
     }
 
 

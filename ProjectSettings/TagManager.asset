@@ -6,6 +6,12 @@ TagManager:
   tags:
   - Apple
   - Snake
+  - Turret 0
+  - Turret 1
+  - Turret 2
+  - Turret 3
+  - Wall
+  - Laser
   layers:
   - Default
   - TransparentFX
