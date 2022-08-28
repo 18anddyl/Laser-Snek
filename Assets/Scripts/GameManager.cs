@@ -4,15 +4,18 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+using System.Xml.Serialization;
+using System.IO;
+
 public class GameManager : MonoBehaviour
 {
     //Apple Variables
     public GameObject apple;
     public bool appleAlive = true;
-    private float minBorder = -4.75f;
-    private float maxBorder = 4.75f;
+    private float minBorder = -3.0f;
+    private float maxBorder = 3.0f;
 
-    //Highscore Variable
+    //Highscore Variables
     public int score;
 
     //Title screen Variables
@@ -21,6 +24,7 @@ public class GameManager : MonoBehaviour
     public GameObject deathScreen;
     public bool death = false;
     public GameObject scoreText;
+    public GameObject deathScoreText;
 
     //Turret shooting variable
     public GameObject[] turrets;
@@ -55,6 +59,8 @@ public class GameManager : MonoBehaviour
     {
 
         scoreText.GetComponent<TMPro.TextMeshProUGUI>().text = "Score : " + score.ToString();
+
+
         //Spawn new apple when snake eats apple
         if(!appleAlive)
         {
@@ -66,6 +72,7 @@ public class GameManager : MonoBehaviour
         {
             deathScreen.SetActive(true);
             scoreText.SetActive(false);
+            deathScoreText.GetComponent<TMPro.TextMeshProUGUI>().text = score.ToString();
         }
     }
     //Choose random place for apple to spawn
