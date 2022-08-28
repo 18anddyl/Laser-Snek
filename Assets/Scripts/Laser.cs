@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Laser : MonoBehaviour
 {
+    //Variables
     public float speed = 2.5f;
     public GameManager gameManager;
 
@@ -12,7 +13,8 @@ public class Laser : MonoBehaviour
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
-    // Update is called once per frame
+
+    //Move the laser forwards
     void Update()
     {
         if (gameManager.gameStart == true)
@@ -22,6 +24,7 @@ public class Laser : MonoBehaviour
         
     }
 
+    //Destroy the laser when it hits the wall
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Wall"))

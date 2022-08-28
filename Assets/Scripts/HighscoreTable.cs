@@ -5,34 +5,61 @@ using UnityEngine.UI;
 
 public class HighscoreTable : MonoBehaviour
 {
-    //Table Variables
+    //Variables
     public Transform entryContainer;
     public Transform entryTemplate;
-    private List<HighscoreEntry> highscoreEntryList;
-    private List<Transform> highscoreEntryTransformList;
+    private List<Transform> highscoreTransformList;
+
+
 
     private void Awake()
     {
+        //PlayerPrefs.DeleteAll();
+
         //Template is set to false so newly created lines are then set to true.
         entryTemplate.gameObject.SetActive(false);
 
-        highscoreEntryList = new List<HighscoreEntry>()
-        {
-            new HighscoreEntry{ score = 521854, name = "Cat"},
-            new HighscoreEntry{ score = 54354, name = "Dog"},
-            new HighscoreEntry{ score = 8764, name = "Pen"},
-            new HighscoreEntry{ score = 986543, name = "ASS"},
-            new HighscoreEntry{ score = 4256, name = "JOD"},
-            new HighscoreEntry{ score = 1, name = "JGA"},
-            new HighscoreEntry{ score = 23, name = "OSK"},
-        };
+        //Unloads the list of highscores from the previous Save. Turns the Playerprefs back into the list of highscores.
+        string jsonString = PlayerPrefs.GetString("highscoreTable");
+        Highscores highscores = JsonUtility.FromJson<Highscores>(jsonString);
 
-        foreach(HighscoreEntry highscoreEntry in highscoreEntryList)
+        //If no highscores in table
+        if (highscores == null)
         {
-            NewHighscoreEntry(highscoreEntry, entryContainer, highscoreEntryTransformList);
+            AddHighscoreEntry(1, "TST");
+
+            jsonString = PlayerPrefs.GetString("highscoreTable");
+            highscores = JsonUtility.FromJson<Highscores>(jsonString);
+        }
+
+        //Sort list by highest score
+        for(int i = 0; i < highscores.highscoreList.Count; i++)
+        {
+            //Sorts through every entry after the first entry being checked
+            for (int o = i + 1; o <highscores.highscoreList.Count; o++)
+            {
+            //If entry being cheked is a lower score than that being compared then swap the two in the list
+                if (highscores.highscoreList[o].score > highscores.highscoreList[i].score)
+                {
+                Highscore tmp = highscores.highscoreList[i];
+                highscores.highscoreList[i] = highscores.highscoreList[o];
+                highscores.highscoreList[o] = tmp;
+                }
+            }
+        }
+
+        
+        //Runs the NewHighscore funtion for however many times that there are highscores in the list
+        highscoreTransformList = new List<Transform>();
+        for(int i = 0; i < highscores.highscoreList.Count && i < 10; i++)
+        {
+            NewHighscore(highscores.highscoreList[i], entryContainer, highscoreTransformList);
         }
     }
-    private void NewHighscoreEntry(HighscoreEntry highscoreEntry, Transform container, List<Transform> transformList)
+
+
+
+    private void NewHighscore(Highscore highscoreEntry, Transform container, List<Transform> transformList)
     {
         float templateHeight = 20f;
 
@@ -42,7 +69,7 @@ public class HighscoreTable : MonoBehaviour
         entryRectTransform.anchoredPosition = new Vector2(0, -templateHeight * transformList.Count);
         entryTransform.gameObject.SetActive(true);
 
-        //position text variables. List starts at 0 so add 1.
+        //ranking text variables. List starts at 0 so add 1.
         int rank = transformList.Count + 1;
         string rankString;
 
@@ -54,20 +81,61 @@ public class HighscoreTable : MonoBehaviour
             case 3: rankString = "3RD"; break;
             default: rankString = rank + "TH"; break;
         }
-        entryTransform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = rankString; // Position text is set to 1st, 3rd, 9th etc.
+        entryTransform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = rankString; // Position text is set to 1st, 3rd, 9th etc.
 
-
+        //sets the score text to the score
         int score = highscoreEntry.score;
-        entryTransform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = score.ToString();  //Score
+        entryTransform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = score.ToString();  //Score
 
+        //sets the name text to the name
         string name = highscoreEntry.name;
-        entryTransform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = name;  //Name
+        entryTransform.GetChild(3).GetComponent<TMPro.TextMeshProUGUI>().text = name;  //Name
 
+        //Aesthetics, if rank is odd then activate background
+        entryTransform.GetChild(0).gameObject.SetActive(rank % 2 == 1);
         transformList.Add(entryTransform);
     }
 
+
+    //This function allows a highscore to be added to the highscore list. It is public so it can be called from the GameManager Script.
+    public void AddHighscoreEntry(int score, string name)
+    {
+        //Create a new Highscore
+        Highscore highscore = new Highscore { score = score, name = name};
+
+        //Loads the already save highscores
+        string jsonString = PlayerPrefs.GetString("highscoreTable");
+        Highscores highscores = JsonUtility.FromJson<Highscores>(jsonString);
+
+        //If no highscores, make new highscore list
+        if(highscores == null)
+        {
+            highscores = new Highscores()
+            {
+            highscoreList = new List<Highscore>()
+            };
+        }
+
+        //Adds a new entry to the highscores
+        highscores.highscoreList.Add(highscore);
+
+        //Save updated highscores
+        string json = JsonUtility.ToJson(highscores);
+        PlayerPrefs.SetString("highscoreTable", json);
+        PlayerPrefs.Save();
+    }
+
+
+    //Class used for json to save highscores
+    private class Highscores
+    {
+        public List<Highscore> highscoreList;
+    }
+
     //Holds a highscore entry. entrys need a score value and a name value.
-    private class HighscoreEntry
+    //Allows the Highscores to be serialized
+    [System.Serializable]
+    private class Highscore
     {
         public int score;
         public string name;

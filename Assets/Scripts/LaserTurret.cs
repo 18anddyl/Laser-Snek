@@ -53,13 +53,10 @@ public class LaserTurret : MonoBehaviour
                 shoot = false;
             }
         }
-
-
-
-
-
     }
-    IEnumerator ShootTurret()
+
+    //Function is called from the GameManager script. Makes the turret turn red to shoot a laser, then returns to yellow.
+    public IEnumerator ShootTurret()
     {
         colourChange.material.SetColor("_Color", Color.red);
         Instantiate(laser, barrel.transform.position + new Vector3(0, -0.25f, 0), barrel.transform.rotation);
@@ -67,6 +64,4 @@ public class LaserTurret : MonoBehaviour
         colourChange.material.SetColor("_Color", Color.yellow);
     }
 
-}
-//for (int i = 0; i < 1f; i + (Time.deltaTime);)
-//gameObject.GetComponentInChildren<Renderer>().material.color = Color.Lerp(Color.yellow, Color.red, colourChange);
+} 

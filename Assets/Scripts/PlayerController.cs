@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    //Variables
     public GameManager gameManager;
     public int speed = 2;
-    // Start is called before the first frame update
+
+
     void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -15,7 +17,7 @@ public class PlayerController : MonoBehaviour
     
     void Update()
     {
-        //Player Moving
+        //Player Moving with arrow keys
         if(gameManager.gameStart == true)
         {
             transform.Translate(Vector3.up * Time.deltaTime * speed);
@@ -47,6 +49,8 @@ public class PlayerController : MonoBehaviour
             Destroy(other.gameObject);
             gameManager.appleAlive = false;
         }
+
+        //Player death on touching either wall or laser
         else if (other.gameObject.CompareTag("Wall") || other.gameObject.CompareTag("Laser"))
         {
             gameManager.gameStart = false;
