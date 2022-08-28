@@ -43,7 +43,7 @@ public class LaserTurret : MonoBehaviour
         //Rotates back and forth when game starts
         if(gameManager.gameStart)
         {
-            float rY = Mathf.SmoothStep((rotAngleY * turretNumber), (rotAngleY * turretNumber + 90), Mathf.PingPong(Time.time, 1));
+            float rY = Mathf.SmoothStep((rotAngleY * turretNumber + 30), (rotAngleY * turretNumber + 60), Mathf.PingPong(Time.time, 1));
             transform.rotation = Quaternion.Euler(0, rY, 0);
             
             //shooting
